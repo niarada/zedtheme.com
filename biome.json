@@ -1,0 +1,36 @@
+{
+    "files": {
+        "ignore": []
+    },
+    "formatter": {
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineWidth": 120
+    },
+    "linter": {
+        "rules": {
+            "style": {
+                "noNonNullAssertion": "off",
+                "noParameterAssign": "off",
+                "useImportType": "off"
+            },
+            "a11y": {
+                "all": false
+            },
+            "suspicious": {
+                "noUnsafeDeclarationMerging": "off",
+                "noAssignInExpressions": "off",
+                "noCatchAssign": "off"
+            },
+            "performance": {
+                "noDelete": "off"
+            },
+            "complexity": {
+                "noThisInStatic": "off"
+            }
+        }
+    },
+    "organizeImports": {
+        "enabled": false
+    }
+}

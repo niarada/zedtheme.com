@@ -1,0 +1,60 @@
+import { getThemes } from "~/lib/extensions";
+import { createCssVariablesTheme, codeToHtml, getHighlighter } from "shiki";
+
+const themes = getThemes()//.slice(0, 4);
+
+const sample = `// A "Hello, world!" program in TypeScript
+function greet(name: string) {
+    console.log(\`Hello, \${ name }!\`);
+}
+greet("TypeScript");
+`
+
+const highlighter = await getHighlighter({
+    langs: ['typescript'],
+    themes: [
+        createCssVariablesTheme({
+            variablePrefix: '--shiki-',
+        })
+    ]
+})
+
+const smap = {
+
+}
+// ${Object.entries(theme.style.syntax).filter(([key, value]) => value.color).map(([key, value]) => `.shiki-token-${key.replace(/[_\.]/g, '-')} { color: ${value.color}; }`).join('\n')}
+themes.forEach((theme, i) => {
+    theme.class = `theme-${i}`;
+    theme.css = `
+        .theme-${i} {
+            ${Object.entries(theme.style).filter(([key, value]) => typeof value === "string").map(([key, value]) => `--${key.replace(/[_\.]/g, '-')}: ${value};`).join('\n')}
+            ${Object.entries(theme.style.syntax).filter(([key, value]) => value.color).map(([key, value]) => `--shiki-token-${key.replace(/[_\.]/g, '-')}: ${value.color};`).join('\n')}
+            --shiki-token-string-expression: var(--shiki-token-string);
+            --shiki-foreground: var(--editor-foreground);
+            background-color: var(--editor-background);
+            color: var(--editor-foreground);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid gray;
+        }
+    `;
+    theme.samp = highlighter.codeToHtml(sample, {
+        lang: "typescript", theme: 'css-variables'
+    })
+});
+
+<html>
+
+<head>
+    <link rel="stylesheet" href="/index.css">
+    <style type="text/css" rx-each={themes} rx-as="theme" rx-content={theme.css} />
+</head>
+
+<body class="p-12 grid grid-cols-2 gap-6 bg-gray-300">
+    <div rx-each={themes} rx-as="theme" class="flex flex-col gap-2">
+        <div class="font-bold">{theme.name} ({theme.extensionName})</div>
+        <div class={theme.class} rx-content={theme.samp} />
+    </div>
+</body>
+
+</html>
