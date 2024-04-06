@@ -1,59 +1,90 @@
-import { getThemes } from "~/lib/extensions";
-import { createCssVariablesTheme, codeToHtml, getHighlighter } from "shiki";
+import { getThemes, lastExtensionUpdate } from "~/lib/extensions";
+import { highlight } from "tree-sitter-highlight";
+import { formatDistanceToNow } from "date-fns";
 
-const themes = getThemes()//.slice(0, 4);
+const themes = getThemes();
 
-const sample = `// A "Hello, world!" program in TypeScript
-function greet(name: string) {
-    console.log(\`Hello, \${ name }!\`);
+const sample = highlight(`// Interface to type the structure of Gifts of the Spirit
+interface GiftOfTheSpirit {
+  name: string;
+  description: string;
 }
-greet("TypeScript");
-`
 
-const highlighter = await getHighlighter({
-    langs: ['typescript'],
-    themes: [
-        createCssVariablesTheme({
-            variablePrefix: '--shiki-',
-        })
-    ]
-})
+// Define the gifts of the Spirit based on the book of Galatians
+const giftsOfTheSpirit: GiftOfTheSpirit[] = [
+  { name: "Love", description: "Unconditional love that comes from God." },
+  { name: "Joy", description: "A deep-rooted, inspired happiness." },
+  { name: "Peace", description: "A tranquility and quietness of spirit." },
+  { ...others },
+];
 
-const smap = {
-
+// Function to display the information about a specific gift of the Spirit
+function displayGift(gift: GiftOfTheSpirit): void {
+  console.log(\`Gift: \${gift.name}\`);
+  console.log(\`Description: \${gift.description}\n\`);
 }
-// ${Object.entries(theme.style.syntax).filter(([key, value]) => value.color).map(([key, value]) => `.shiki-token-${key.replace(/[_\.]/g, '-')} { color: ${value.color}; }`).join('\n')}
-themes.forEach((theme, i) => {
-    theme.class = `theme-${i}`;
-    theme.css = `
-        .theme-${i} {
-            ${Object.entries(theme.style).filter(([key, value]) => typeof value === "string").map(([key, value]) => `--${key.replace(/[_\.]/g, '-')}: ${value};`).join('\n')}
-            ${Object.entries(theme.style.syntax).filter(([key, value]) => value.color).map(([key, value]) => `--shiki-token-${key.replace(/[_\.]/g, '-')}: ${value.color};`).join('\n')}
-            --shiki-token-string-expression: var(--shiki-token-string);
-            --shiki-foreground: var(--editor-foreground);
-            background-color: var(--editor-background);
-            color: var(--editor-foreground);
-            padding: 1rem;
-            border-radius: 0.5rem;
-            border: 1px solid gray;
+
+// Display all the gifts of the Spirit from Galatians
+console.log("Gifts of the Spirit from Galatians:");
+giftsOfTheSpirit.forEach(displayGift);`, 2);
+
+type TransformedTheme = typeof themes[0] & {
+    class: string
+    css: string
+}
+
+const transformedThemes = themes.map((theme, i) => {
+    return {
+        ...theme, ...{
+            class: `theme-${i}`,
+            css: `
+            .theme-${i} {
+                ${Object
+                    .entries(theme.style.syntax)
+                    .filter(([key, value]) => value.color)
+                    .map(([key, value]) => `.${key.replace(/[_\.]/g, '-')} { color: ${value.color}; }`).join('\n')}
+                background-color: ${theme.style["editor.background"]};
+                color: ${theme.style["editor.foreground"]};
+            }
+        `,
         }
-    `;
-    theme.samp = highlighter.codeToHtml(sample, {
-        lang: "typescript", theme: 'css-variables'
-    })
+    } as TransformedTheme
 });
 
 <html>
 
 <head>
     <link rel="stylesheet" href="/index.css">
-    <style type="text/css" rx-each={themes} rx-as="theme" rx-content={theme.css} />
+    <style type="text/css" rx-each={transformedThemes} rx-as="theme" rx-content={theme.css} />
 </head>
 
-<body class="p-12 grid grid-cols-2 gap-6 bg-gray-300">
-    <div rx-each={themes} rx-as="theme" class="flex flex-col gap-2">
-        <div class="font-bold">{theme.name} ({theme.extensionName})</div>
-        <div class={theme.class} rx-content={theme.samp} />
+<body class="p-12 bg-slate-800 text-slate-50">
+    <div class="container m-auto">
+        <div class="text-4xl pb-8">
+            Zed Editor Theme List
+        </div>
+        <div class="pb-8 flex flex-col gap-2">
+            <div>
+                This list is generated from the themes in the <a class="underline"
+                    href="https://github.com/zed-industries/extensions">extensions</a> repo.
+            </div>
+            <div>
+                Last updated: {formatDistanceToNow(lastExtensionUpdate())} ago
+            </div>
+            <div class="text-xs">
+                Made with <a class="underline" href="https://github.com/niarada/remedy">Remedy</a>
+            </div>
+        </div>
+        <div class="flex flex-col gap-12">
+            <div rx-each={transformedThemes} rx-as="theme" class="flex flex-col gap-2">
+                <div class="flex gap-3 items-baseline">
+                    <span class="font-bold text-2xl">{theme.name}</span>
+                    <span class="text-slate-400 text-sm">{theme.extensionName}</span>
+                </div>
+                <pre
+                    class="{theme.class} text-sm border border-slate-600 rounded p-4"><code rx-content={sample} /></pre>
+            </div>
+        </div>
     </div>
 </body>
 

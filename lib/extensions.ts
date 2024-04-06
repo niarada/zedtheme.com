@@ -1,6 +1,6 @@
 import { $ } from "bun";
 import { parse as parseToml } from "@iarna/toml";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { parse as parseJsonc } from "comment-json";
 
 export async function syncExtensions(): Promise<void> {
@@ -14,6 +14,11 @@ export async function syncExtensions(): Promise<void> {
     console.log("Done");
 }
 
+export function lastExtensionUpdate() {
+    const stat = statSync("extensions/extensions.toml");
+    return stat.mtime;
+}
+
 interface ExtensionInfo {
     submodule: string;
     path?: string;
@@ -22,6 +27,15 @@ interface ExtensionInfo {
 interface ExtensionDetail {
     name: string;
     version: string;
+}
+
+interface Theme {
+    name: string;
+    appearance: string;
+    extensionName: string;
+    extensionVersion: string;
+    author: string;
+    style: Record<string, unknown> & { syntax: Record<string, { color: string }> };
 }
 
 export function getThemes() {
@@ -60,5 +74,5 @@ export function getThemes() {
             }
             return null;
         })
-        .filter((it) => it);
+        .filter((it) => it) as Theme[];
 }

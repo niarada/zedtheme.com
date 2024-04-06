@@ -6,6 +6,7 @@
     "@niarada/remedy": "^0.4.2",
     "bun-types": "^1.1.1",
     "comment-json": "^4.2.3",
-    "shiki": "^1.2.4"
+    "date-fns": "^3.6.0",
+    "tree-sitter-highlight": "^1.0.1"
   }
 }
