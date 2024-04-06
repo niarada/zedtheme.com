@@ -1,3 +1,4 @@
+import type { SyntaxStyles } from "~/lib/extensions";
 import { getThemes, lastExtensionUpdate } from "~/lib/extensions";
 import { highlight } from "tree-sitter-highlight";
 import { formatDistanceToNow } from "date-fns";
@@ -33,6 +34,14 @@ type TransformedTheme = typeof themes[0] & {
     css: string
 }
 
+function styles(value: SyntaxStyles) {
+    const styles = [];
+    value.color && styles.push(`color: ${value.color};`);
+    value.font_weight && styles.push(`font-weight: ${value.font_weight};`);
+    value.font_style === "italic" && styles.push(`font-style: italic;`);
+    return styles.join(" ");
+}
+
 const transformedThemes = themes.map((theme, i) => {
     return {
         ...theme, ...{
@@ -42,7 +51,7 @@ const transformedThemes = themes.map((theme, i) => {
                 ${Object
                     .entries(theme.style.syntax)
                     .filter(([key, value]) => value.color)
-                    .map(([key, value]) => `.${key.replace(/[_\.]/g, '-')} { color: ${value.color}; }`).join('\n')}
+                    .map(([key, value]) => `.${key.replace(/[_\.]/g, '-')} { ${styles(value)} }`).join('\n')}
                 background-color: ${theme.style["editor.background"]};
                 color: ${theme.style["editor.foreground"]};
             }

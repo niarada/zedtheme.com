@@ -29,13 +29,21 @@ interface ExtensionDetail {
     version: string;
 }
 
+export interface SyntaxStyles {
+    color?: string;
+    font_weight?: number;
+    font_style?: string;
+}
+
 interface Theme {
     name: string;
     appearance: string;
     extensionName: string;
     extensionVersion: string;
     author: string;
-    style: Record<string, unknown> & { syntax: Record<string, { color: string }> };
+    style: Record<string, unknown> & {
+        syntax: Record<string, SyntaxStyles>;
+    };
 }
 
 export function getThemes() {
