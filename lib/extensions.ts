@@ -5,7 +5,7 @@ import { parse as parseJsonc } from "comment-json";
 
 export async function syncExtensions(): Promise<void> {
     console.log("Syncing extensions...");
-    if (existsSync("extensions")) {
+    if (existsSync("extensions/extensions.toml")) {
         await $`git -C extensions pull --recurse-submodules=on-demand`;
         await $`git -C extensions submodule update --init --recursive`;
     } else {
