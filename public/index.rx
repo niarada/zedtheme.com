@@ -22,7 +22,7 @@ const giftsOfTheSpirit: GiftOfTheSpirit[] = [
 // Function to display the information about a specific gift of the Spirit
 function displayGift(gift: GiftOfTheSpirit): void {
   console.log(\`Gift: \${gift.name}\`);
-  console.log(\`Description: \${gift.description}\n\`);
+  console.log(\`Description: \${gift.description}\`);
 }
 
 // Display all the gifts of the Spirit from Galatians
