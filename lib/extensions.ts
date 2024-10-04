@@ -70,6 +70,9 @@ export function getThemes() {
                         author: string;
                         themes: { name: string; appearance: string }[];
                     };
+                    if (!themeFile.themes) {
+                        return null;
+                    }
                     return themeFile.themes.flatMap((theme) => {
                         return {
                             extensionName: extension.name,

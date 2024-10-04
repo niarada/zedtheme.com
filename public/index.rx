@@ -43,6 +43,9 @@ function styles(value: SyntaxStyles) {
 }
 
 const transformedThemes = themes.map((theme, i) => {
+    if (!theme.style || !theme.style.syntax) {
+        return null;
+    }
     return {
         ...theme, ...{
             class: `theme-${i}`,
@@ -58,7 +61,7 @@ const transformedThemes = themes.map((theme, i) => {
         `,
         }
     } as TransformedTheme
-});
+}).filter((it) => it) as TransformedTheme[];
 
 <html>
 
@@ -89,7 +92,7 @@ const transformedThemes = themes.map((theme, i) => {
             </div>
         </div>
         <div class="flex flex-col gap-12">
-            <div rx-each={transformedThemes} rx-as="theme" class="flex flex-col gap-2">
+            <div rx-each={transformedThemes} rx-as="theme" class="flex flex-col gap-2 overflow-x-hidden">
                 <div class="flex gap-3 items-baseline">
                     <span class="font-bold text-2xl">{theme.name}</span>
                     <span class="text-slate-400 text-sm">{theme.extensionName}</span>
